@@ -7,8 +7,6 @@ Certa empresa deseja premiar clientes que são bons pagadores a cada fim do mês
 * Contas podem estar em atraso
 * Por mais de 30 dias atrasados podemos considerar mais grave
 
-Cliente: Thiago
-
 **Integrantes:**
 * ALESSANDRA MARIA RAMOS BARROS DE MOURA
 * CLECIANA MARIA DE SANTANA
