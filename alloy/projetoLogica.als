@@ -7,7 +7,8 @@ sig Fidelizacao{
 
 -- classe cliente que tem como atributo boletos
 sig Cliente{
-	boletos: set(Boleto)	
+	boletos: set(Boleto)	,
+	fidelizacao: lone(TipoFidelizacao)
 }
 
 -- classe boleto que tem como atributos a data de vencimento em string e se o boleto ja foi pago(1 ou 0)
@@ -17,17 +18,22 @@ sig Boleto{
 }
 
 -- classe abstrata dos tipos de fidelizacao
-abstract sig TipoFidelizacao{}
+abstract sig TipoFidelizacao{
+	cliente: one Cliente
+}
 
 --os tipos de fidelizacao, que extendem a classe TipoFidelização
 sig Ouro, Prata, Bronze extends TipoFidelizacao{}
 
--- classe socio faz a juncao de fidelizacao e cliente, os tendo como atributo
-sig Socio{
-	cliente: one(Cliente),
-	fidelizacao: one(Fidelizacao)
-}
 
+fact {
+	no tipoFidelizacao
+	-- nao devem existir fidelizacoes sem clientes
+	all t:TipoFidelizacao | #t.cliente > 0
+	--relacao eh bidirecional
+	all t:TipoFidelizacao | (t.cliente.fidelizacao = t)
+	#TipoFidelizacao = #Cliente
+}
 pred show[]{}
-run show for 6
+run show for 10
  
