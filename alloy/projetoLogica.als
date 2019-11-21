@@ -1,30 +1,29 @@
 module fidelizacao
 
 -- classe fidelizacao que tem como atributo o tipo de fidelizacao, que varia com o percentual de boletos pagos
-sig Fidelizacao{
-	tipoFidelizacao: one(TipoFidelizacao)
+sig Fidelizacao {
+	tipoFidelizacao: one TipoFidelizacao
 }
 
 -- classe cliente que tem como atributo boletos
-sig Cliente{
-	boletos: set(Boleto)	,
-	fidelizacao: lone(TipoFidelizacao)
+sig Cliente {
+	boletos: set Boleto,
+	fidelizacao: lone TipoFidelizacao
 }
 
 -- classe boleto que tem como atributos a data de vencimento em string e se o boleto ja foi pago(1 ou 0)
-sig Boleto{
-	vencimento:String,
-	pago:Int
+sig Boleto {
+	--vencimento:String,
+	--pago:Int
 }
 
 -- classe abstrata dos tipos de fidelizacao
-abstract sig TipoFidelizacao{
+abstract sig TipoFidelizacao {
 	cliente: one Cliente
 }
 
 --os tipos de fidelizacao, que extendem a classe TipoFidelização
-sig Ouro, Prata, Bronze extends TipoFidelizacao{}
-
+sig Ouro, Prata, Bronze extends TipoFidelizacao {}
 
 fact {
 	no tipoFidelizacao
@@ -33,7 +32,16 @@ fact {
 	--relacao eh bidirecional
 	all t:TipoFidelizacao | (t.cliente.fidelizacao = t)
 	#TipoFidelizacao = #Cliente
+	--todo cliente tem boletos
+	all c:Cliente | some c.boletos
 }
+
+assert nemTodoClienteEhBomPagador {
+	all c:Cliente | lone c.fidelizacao
+}
+
+check nemTodoClienteEhBomPagador for 50
+
 pred show[]{}
-run show for 10
+run show for 50
  
