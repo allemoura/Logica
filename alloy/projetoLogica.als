@@ -1,21 +1,24 @@
 module fidelizacao
 
--- classe fidelizacao que tem como atributo o tipo de fidelizacao, que varia com o percentual de boletos pagos
-sig Fidelizacao {
-	tipoFidelizacao: one TipoFidelizacao
-}
-
 -- classe cliente que tem como atributo boletos
 sig Cliente {
 	boletos: set Boleto,
-	fidelizacao: lone TipoFidelizacao
+	fidelizacao: lone TipoFidelizacao,
+	divida: lone Divida
 }
 
--- classe boleto que tem como atributos a data de vencimento em string e se o boleto ja foi pago(1 ou 0)
+-- classe boleto que representa  as contas do cliente
 sig Boleto {
-	--vencimento:String,
-	--pago:Int
+	pagador: one Cliente
 }
+
+--classe abstrata que simboliza o grau de divida de um cliente 
+abstract sig Divida {
+	cliente: one Cliente
+}
+
+--graus de divida possíveis
+sig Simples, Media, Critica extends Divida {}
 
 -- classe abstrata dos tipos de fidelizacao
 abstract sig TipoFidelizacao {
@@ -26,22 +29,30 @@ abstract sig TipoFidelizacao {
 sig Ouro, Prata, Bronze extends TipoFidelizacao {}
 
 fact {
-	no tipoFidelizacao
 	-- nao devem existir fidelizacoes sem clientes
 	all t:TipoFidelizacao | #t.cliente > 0
-	--relacao eh bidirecional
+
 	all t:TipoFidelizacao | (t.cliente.fidelizacao = t)
-	#TipoFidelizacao = #Cliente
+	all d:Divida | d.cliente.divida = d
+
 	--todo cliente tem boletos
 	all c:Cliente | some c.boletos
+
+	--se um cliente e ouro, ele nao tem divida
+
+	--se um cliente eh prata, ele pode ter divida simples ou nenhuma
+
+	--se um cliente eh bronze ele pode ter divida media ou nenhuma
+
+	--se um cliente nao tem fidelizacao, ele tem divida critica
 }
 
 assert nemTodoClienteEhBomPagador {
-	all c:Cliente | lone c.fidelizacao
+	all c:Cliente | #c.fidelizacao = 0 or #c.fidelizacao = 1
 }
 
-check nemTodoClienteEhBomPagador for 50
+check nemTodoClienteEhBomPagador for 30
 
 pred show[]{}
-run show for 50
+run show for 20
  
