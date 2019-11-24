@@ -1,0 +1,68 @@
+MODULE fidelizacao
+VAR
+  state: {nulo, bronze, prata, ouro};
+ASSIGN
+  init(state) := nulo;
+  next(state) :=
+                case
+                      state = nulo : {nulo, bronze};
+                      state = bronze:{nulo, bronze, prata};
+                      state = prata: {bronze, prata, ouro};
+                      state = ouro: {ouro, prata};
+                      TRUE: state;
+                esac;
+MODULE boleto
+VAR
+  state : {aberto, atrasado, pago};
+ASSIGN
+  init(state) := aberto;
+  next(state) :=
+                case
+                      state = aberto: {aberto, atrasado};
+                      state = atrasado :{atrasado, pago};
+                      state = pago: pago;
+                      TRUE: state;
+                esac;
+
+MODULE cliente
+VAR
+  boletos : boleto;
+  state: {bomPagador, malPagador};
+  fidelizacao : fidelizacao;
+  
+ASSIGN
+  init(state) := bomPagador;
+  next(state) :=
+                case
+                      state = bomPagador: {bomPagador, malPagador};
+                      state = malPagador: {malPagador, bomPagador};
+                      TRUE: state;
+                  esac;
+
+MODULE main
+  VAR
+    cliente: {bomPagador, malPagador};
+    boleto: {aberto, atrasado, pago};
+    fidelizacao: {nulo, bronze, prata, ouro};
+  
+  ASSIGN
+   init(cliente) := bomPagador;
+   init(boleto)  := aberto;
+   init(fidelizacao) := nulo;
+   
+   next(cliente) := case
+   
+		cliente = bomPagador & boleto = atrasado & fidelizacao = nula : malPagador;
+		cliente = bomPagador & boleto = atrasado & fidelizacao = bronze : bomPagador;
+		
+		TRUE: cliente;
+		esac;
+		
+	
+		
+   
+    
+    
+
+  
+
