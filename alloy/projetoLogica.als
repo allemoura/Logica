@@ -34,7 +34,6 @@ fact {
 
 	all t:TipoFidelizacao | (t.associado.fidelizacao = t)
 	all d:Divida | d.cliente.divida = d
-	--all b:Boleto | b.pagador.boletos = b
 
 	--todo cliente tem boletos
 	all c:Cliente | some c.boletos
@@ -60,8 +59,8 @@ assert clientesComDividasCriticasSaoDesfidelizados {
 	all c:Cliente | c.divida = Critica => no c.fidelizacao
 }
 
---check nemTodoClienteEhBomPagador for 30
-check clientesComDividasCriticasSaoDesfidelizados for 30
+check nemTodoClienteEhBomPagador for 120
+check clientesComDividasCriticasSaoDesfidelizados for 120
 
 --pred show[]{}
 --run show for 40
