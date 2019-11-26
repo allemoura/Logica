@@ -1,0 +1,52 @@
+MODULE main
+  VAR
+  fidelizacao: {nulo, bronze, prata, ouro};
+  boleto : {aberto, atrasado, pago};
+  state: {bomPagador, malPagador};
+
+  ultimoDiaMes: {boolean};
+  contas: {contasPagasNoPrazo, contasEmAtraso};
+  contasEmAtraso: {uma, maisUma, duas, maisDuas, tres, maisTres};
+
+ASSIGN
+  init(fidelizacao) := nulo;
+  next(fidelizacao) :=
+                case
+                      fidelizacao = nulo : {nulo, bronze};
+                      fidelizacao = bronze:{nulo, bronze, prata};
+                      fidelizacao = prata: {bronze, prata, ouro};
+                      fidelizacao = ouro: {ouro, prata};
+                      fidelizacao = nulo & state = bomPagador: {bronze}; 
+                      fidelizacao = bronze & state = bomPagador: {prata};
+                      fidelizacao = prata & state = bomPagador: {ouro};
+                      fidelizacao = bronze & contasEmAtraso = maisUma: {nulo};
+                      fidelizacao = bronze & contasEmAtraso = uma & state = malPagador : {nulo};
+                      fidelizacao = bronze & contasEmAtraso = uma & state = bomPagador : {bronze};
+                      fidelizacao = prata & contasEmAtraso = maisDuas: {bronze};
+                      fidelizacao = prata & contasEmAtraso = duas & state = malPagador: {bronze};
+                      fidelizacao = prata & contasEmAtraso = duas & state = bomPagador: {prata};
+                      fidelizacao = ouro & contasEmAtraso = maisTres: {prata};
+                      fidelizacao = ouro & contasEmAtraso = tres & state = malPagador: {prata};
+                      fidelizacao = ouro & contasEmAtraso = tres & state = bomPagador: {ouro};
+                      TRUE: fidelizacao;
+                esac;
+
+  init(boleto) := aberto;
+  next(boleto) :=
+                case
+                      boleto = aberto: {aberto, atrasado};
+                      boleto = atrasado :{atrasado, pago};
+                      boleto = pago: pago;
+                      boleto = aberto & ultimoDiaMes = true: {atrasado};
+                      boleto = aberto & ultimoDiaMes = false: {aberto};
+                      TRUE: boleto;
+                esac;
+
+  init(state) := bomPagador;
+  next(state) :=
+                case
+                      state = bomPagador: {bomPagador, malPagador};
+                      state = malPagador: {malPagador, bomPagador};
+                      contas = contasPagasNoPrazo : {bomPagador};
+                      TRUE: state;
+                  esac;
