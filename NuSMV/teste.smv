@@ -42,3 +42,26 @@ ASSIGN
 MODULE main
   VAR
     c:cliente;
+    fatura: 0..100; -- porcentagem de faturas pagas dentro do prazo
+    ultimoDiaDoMes: boolean;
+
+ASSIGN
+  init(c) := state{bomPagador};
+  next(c) :=
+            case
+                  c = state{bomPagador} & fatura >= 75: bomPagador;
+                  c = state{bomPagador} & fatura < 75: malPagador;
+                  c = state{malPagador} & fatura < 75: malPagador;
+                  TRUE: c;
+              esac;
+
+  init(c) := boleto{atrasado};
+  next(c) := 
+                          case
+                                c = boleto{aberto} & ultimoDiaDoMes = true : atrasado; 
+                                c = boleto{aberto} & ultimoDiaDoMes = falso : pago;
+                                TRUE: c;
+
+  --init(c) := fidelizacao(nulo);
+  --next(c) := 
+
