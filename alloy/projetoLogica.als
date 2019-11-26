@@ -1,6 +1,6 @@
 module fidelizacao
 
--- classe cliente que tem como atributo boletos
+-- classe cliente que tem como atributo boletos, e pode ou nao estar fidelizada ou ter dividas
 sig Cliente {
 	boletos: set Boleto,
 	fidelizacao: lone TipoFidelizacao,
@@ -22,37 +22,47 @@ sig Simples, Media, Critica extends Divida {}
 
 -- classe abstrata dos tipos de fidelizacao
 abstract sig TipoFidelizacao {
-	cliente: one Cliente
+	associado: one Cliente
 }
 
 --os tipos de fidelizacao, que extendem a classe TipoFidelização
 sig Ouro, Prata, Bronze extends TipoFidelizacao {}
 
 fact {
-	-- nao devem existir fidelizacoes sem clientes
-	all t:TipoFidelizacao | #t.cliente > 0
+	-- nao devem existir fidelizacoes sem clientes associados
+	all t:TipoFidelizacao |  #t.associado > 0
 
-	all t:TipoFidelizacao | (t.cliente.fidelizacao = t)
+	all t:TipoFidelizacao | (t.associado.fidelizacao = t)
 	all d:Divida | d.cliente.divida = d
+	--all b:Boleto | b.pagador.boletos = b
 
 	--todo cliente tem boletos
 	all c:Cliente | some c.boletos
 
 	--se um cliente e ouro, ele nao tem divida
+	all c:Cliente | (c.fidelizacao = Ouro) => no c.divida
 
 	--se um cliente eh prata, ele pode ter divida simples ou nenhuma
+	all c:Cliente | (c.fidelizacao = Prata) => no c.divida or c.divida = Simples
 
 	--se um cliente eh bronze ele pode ter divida media ou nenhuma
+	all c:Cliente | (c.fidelizacao = Bronze) => no c.divida or c.divida = Media
 
 	--se um cliente nao tem fidelizacao, ele tem divida critica
+	all c:Cliente | no c.fidelizacao <=> c.divida  = Critica
 }
 
 assert nemTodoClienteEhBomPagador {
 	all c:Cliente | #c.fidelizacao = 0 or #c.fidelizacao = 1
 }
 
-check nemTodoClienteEhBomPagador for 30
+assert clientesComDividasCriticasSaoDesfidelizados {
+	all c:Cliente | c.divida = Critica => no c.fidelizacao
+}
 
-pred show[]{}
-run show for 20
+--check nemTodoClienteEhBomPagador for 30
+check clientesComDividasCriticasSaoDesfidelizados for 30
+
+--pred show[]{}
+--run show for 40
  
