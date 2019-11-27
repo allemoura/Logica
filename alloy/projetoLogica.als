@@ -62,6 +62,6 @@ assert clientesComDividasCriticasSaoDesfidelizados {
 check nemTodoClienteEhBomPagador for 120
 check clientesComDividasCriticasSaoDesfidelizados for 120
 
---pred show[]{}
---run show for 40
+pred show[]{}
+run show for 40
  
