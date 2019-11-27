@@ -1,0 +1,36 @@
+MODULE main
+VAR
+    fidelizacao: {bronze, prata, ouro, nulo};
+    boletos: {emAberto, pagos, atrasoSimples, atrasoMedio, atrasoGrave};
+    acao: {pagar, naoPagar};
+
+ASSIGN
+    init(boletos) := emAberto;
+    init(fidelizacao) := nulo;
+
+    next(boletos) :=
+        case
+            boletos = emAberto & acao = pagar: pagos;
+            boletos = emAberto & acao = naoPagar: atrasoSimples;
+            boletos = atrasoSimples & acao = naoPagar: atrasoMedio;
+            boletos = atrasoMedio & acao = naoPagar: atrasoGrave;
+            boletos = atrasoSimples & acao = pagar: pagos;
+            boletos = atrasoMedio & acao = pagar: pagos;
+            boletos = atrasoGrave & acao = pagar: pagos;
+	    boletos = pagos: emAberto;
+            TRUE: boletos;
+        esac;
+
+    next(fidelizacao) :=
+        case
+            fidelizacao = nulo & boletos = pagos: bronze;
+            fidelizacao = bronze & boletos = pagos: prata;
+            fidelizacao = prata & boletos = pagos: ouro;
+            fidelizacao = ouro & boletos = atrasoSimples: prata;
+            fidelizacao = prata & boletos = atrasoMedio: bronze;
+            fidelizacao = bronze & boletos = atrasoGrave: nulo;
+	    fidelizacao = bronze & boletos = atrasoSimples: nulo;
+            fidelizacao = prata & boletos = atrasoSimples: bronze;
+            fidelizacao = nulo & boletos = atrasoSimples: nulo;
+            TRUE: fidelizacao;
+        esac;
