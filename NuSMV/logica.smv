@@ -17,7 +17,7 @@ ASSIGN
             boletos = atrasoSimples & acao = pagar: pagos;
             boletos = atrasoMedio & acao = pagar: pagos;
             boletos = atrasoGrave & acao = pagar: pagos;
-	          boletos = pagos: emAberto;
+	    boletos = pagos: emAberto;
             TRUE: boletos;
         esac;
 
@@ -34,6 +34,7 @@ ASSIGN
             fidelizacao = nulo & boletos = atrasoSimples: nulo;
             TRUE: fidelizacao;
         esac;
+
 LTLSPEC X !(fidelizacao = ouro & boletos = atrasoMedio);
 LTLSPEC X !(fidelizacao = ouro & boletos = atrasoGrave);
 LTLSPEC X !(fidelizacao = ouro & boletos = atrasoSimples);
